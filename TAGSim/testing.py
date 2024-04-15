@@ -1,5 +1,6 @@
 import os
 import json
+import requests
 import numpy as np 
 import tensorflow as tf
 from transformers import AutoModel, AutoTokenizer
@@ -9,9 +10,24 @@ from .utils import cosine_similarity, isc_similarity, correlation_similarity
 
 # We have used the following LLM for embeddings
 DEFAULT_bertModel = 'bert-base-multilingual-cased'
-DEFAULT_modelPath = './models/TAGSim-base'
+DEFAULT_modelPath = 'models/TAGSim-base'
 
-def testModel(dataPath='./dataset/testSet1_WIKI.json', bertModel=DEFAULT_bertModel, modelPath=DEFAULT_modelPath):
+# pre-checks for model
+if not os.path.exists(DEFAULT_modelPath):
+    if not os.path.exists("models"):
+        print("no models directory found, creating...")
+        os.mkdir("models")
+    print("downloading TAGSim-base...")
+    os.mkdir(DEFAULT_modelPath)
+    response = requests.get("https://raw.githubusercontent.com/vipul124/TAGSim/main/TAGSim/models/TAGSim-base/model.json")
+    with open(os.path.join(DEFAULT_modelPath, "model.json"), 'wb') as file:
+        file.write(response.content)
+    response = requests.get("https://raw.githubusercontent.com/vipul124/TAGSim/main/TAGSim/models/TAGSim-base/weights.h5")
+    with open(os.path.join(DEFAULT_modelPath, "weights.h5"), 'wb') as file:
+        file.write(response.content)
+
+
+def testModel(dataPath, bertModel=DEFAULT_bertModel, modelPath=DEFAULT_modelPath):
     # downloading LLM model
     LLM_model = AutoModel.from_pretrained(bertModel, output_hidden_states=True, from_tf=False)
     LLM_tokenizer = AutoTokenizer.from_pretrained(bertModel, output_hidden_states=True, from_tf=False)

@@ -37,6 +37,10 @@ def trainModel(dataPath, bertModel=DEFAULT_bertModel, tfModel=DEFAULT_tfModel, s
     return tfModel
 
 def saveModel(tfModel, modelName):
+    if not os.path.exists("models"):
+        print("no models directory found, creating...")
+        os.mkdir("models")
+    os.mkdir(os.path.join("models", modelName))
     jsonModel = tfModel.to_json()
     with open(os.path.join("models", modelName, "model.json"), "w") as file:
         file.write(jsonModel)
