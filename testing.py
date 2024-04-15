@@ -3,8 +3,8 @@ import json
 import numpy as np 
 import tensorflow as tf
 from transformers import AutoModel, AutoTokenizer
-from pipeline import get_line_vector
-from baselines import cosine_similarity, isc_similarity, correlation_similarity
+from .utils import get_line_vector
+from .utils import cosine_similarity, isc_similarity, correlation_similarity
 
 
 # We have used the following LLM for embeddings
