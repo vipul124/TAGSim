@@ -1,8 +1,7 @@
 import json
 import numpy as np 
-import tensorflow as tf
 from transformers import AutoModel, AutoTokenizer
-from . import loadModel
+from .load_model import loadModel
 from .utils import get_line_vector
 from .utils import cosine_similarity, isc_similarity, correlation_similarity
 
