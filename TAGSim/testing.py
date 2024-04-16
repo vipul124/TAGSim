@@ -32,7 +32,7 @@ def testModel(dataPath, bertModel=DEFAULT_bertModel, modelPath=DEFAULT_modelPath
     ds_in = np.array([[get_line_vector(s[0], LLM_tokenizer, LLM_model), get_line_vector(s[1], LLM_tokenizer, LLM_model)] for s in dataset['ds']])
 
     # get the results
-    print("TAGSim:\t\t\t", "ss -", model.predict(ss_in).mean(), "\t\t;ds -", model.predict(ds_in).mean())
+    print("{}:\t\t\t".format(modelPath), "ss -", model.predict(ss_in).mean(), "\t\t;ds -", model.predict(ds_in).mean())
     print("Cosine Similarity:\t", "ss -", np.array([cosine_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ss_in]).mean(), "\t\t;ds -", np.array([cosine_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ds_in]).mean())
     print("ISC Similarity:\t\t", "ss -", np.array([isc_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ss_in]).mean(), "\t\t;ds -", np.array([isc_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ds_in]).mean())
     print("Correlation Similarity:\t", "ss -", np.array([correlation_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ss_in]).mean(), "\t;ds -", np.array([correlation_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ds_in]).mean())
