@@ -1,9 +1,8 @@
-import os
 import json
-import requests
 import numpy as np 
 import tensorflow as tf
 from transformers import AutoModel, AutoTokenizer
+from . import loadModel
 from .utils import get_line_vector
 from .utils import cosine_similarity, isc_similarity, correlation_similarity
 
@@ -12,20 +11,6 @@ from .utils import cosine_similarity, isc_similarity, correlation_similarity
 DEFAULT_bertModel = 'bert-base-multilingual-cased'
 DEFAULT_modelPath = 'models/TAGSim-base'
 
-# pre-checks for model
-if not os.path.exists(DEFAULT_modelPath):
-    if not os.path.exists("models"):
-        print("no models directory found, creating...")
-        os.mkdir("models")
-    print("downloading TAGSim-base...")
-    os.mkdir(DEFAULT_modelPath)
-    response = requests.get("https://raw.githubusercontent.com/vipul124/TAGSim/main/TAGSim/models/TAGSim-base/model.json")
-    with open(os.path.join(DEFAULT_modelPath, "model.json"), 'wb') as file:
-        file.write(response.content)
-    response = requests.get("https://raw.githubusercontent.com/vipul124/TAGSim/main/TAGSim/models/TAGSim-base/weights.h5")
-    with open(os.path.join(DEFAULT_modelPath, "weights.h5"), 'wb') as file:
-        file.write(response.content)
-
 
 def testModel(dataPath, bertModel=DEFAULT_bertModel, modelPath=DEFAULT_modelPath):
     # downloading LLM model
@@ -33,9 +18,10 @@ def testModel(dataPath, bertModel=DEFAULT_bertModel, modelPath=DEFAULT_modelPath
     LLM_tokenizer = AutoTokenizer.from_pretrained(bertModel, output_hidden_states=True, from_tf=False)
 
     # extracting trained metric / TAGSim
-    model = tf.keras.models.model_from_json(open(os.path.join(modelPath, "model.json")).read())
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mae')
-    model.load_weights(os.path.join(modelPath, "weights.h5"))
+    model = loadModel(modelPath)
+    if not model:
+        print('testing failed: invalid modelPath')
+        return
 
     # opening the dataset file
     file = open(dataPath)
@@ -51,3 +37,4 @@ def testModel(dataPath, bertModel=DEFAULT_bertModel, modelPath=DEFAULT_modelPath
     print("Cosine Similarity:\t", "ss -", np.array([cosine_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ss_in]).mean(), "\t\t;ds -", np.array([cosine_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ds_in]).mean())
     print("ISC Similarity:\t\t", "ss -", np.array([isc_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ss_in]).mean(), "\t\t;ds -", np.array([isc_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ds_in]).mean())
     print("Correlation Similarity:\t", "ss -", np.array([correlation_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ss_in]).mean(), "\t;ds -", np.array([correlation_similarity(x[0].reshape(1, -1), x[1].reshape(1, -1))[0][0] for x in ds_in]).mean())
+    return
