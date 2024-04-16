@@ -12,13 +12,13 @@ This is the official GitHub repository for the implementation of the paper "**TA
 ## Installation
 You can install this package using the following command. Also, the mentioned requirements and dependencies are automatically installed using this.
 ```
-pip3 install git+https://github.com/vipul124/TAGSim.git
+pip install git+https://github.com/vipul124/TAGSim.git
 ```
 
 ## Dataset
 The test datasets that we used for evaluation purposes are made available in the [dataset](/dataset) folder. Datasets used for training of [TAGSim-base](/TAGSim/models/TAGSim-base) model are not uploaded due to size constraints.
 
-## Use
+## Uses
 ### How to train model using your own dataset?
 To train your model using our approach, you'll need to choose the following parameters.
 - `dataPath` - this is a necessary parameter. You need to mention the path of the JSON train file containing an array of $n \times 2 \times 2$ dimensions (A sample train file is provided [here]())
@@ -31,6 +31,29 @@ from TAGSim import trainModel, saveModel
 
 myModel = trainModel(dataPath=dataPath, bertModel=bertModel, tfModel=tfModel, simModel=simModel, epochs=epochs)
 saveModel(myModel, "name_of_model")
+```
+
+### Loading & using your model
+Here is an example of how to load and use the model to determine the semantic similarity of sentences.
+```python
+from TAGSim import loadModel
+from TAGSim.utils import get_line_vector
+import numpy as np
+from transformers import AutoModel, AutoTokenizer
+
+# loading our metric model and downloading LLM models for embeddings
+model = loadModel(model='TAGSim-base')
+LLM_model = AutoModel.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True, from_tf=False)
+LLM_tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased', output_hidden_states=True, from_tf=False)
+
+# calculating semantic similarity
+sentences = [
+    ["The quick brown fox jumps over the lazy dog near the river bank", "A quick brown fox jumps over the lazy dog by the river"],
+    ["Mathematics involves solving complex equations and proofs", "The tropical rainforest is rich with diverse animal species"]
+]
+embeddings = np.array([[get_line_vector(s[0], LLM_tokenizer, LLM_model), get_line_vector(s[1], LLM_tokenizer, LLM_model)] for s in sentences])
+similarity = model.predict(embeddings)
+print("{} - {}\n{} - {}".format(sentences[0], similarity[0], sentences[1], similarity[1]))
 ```
 
 ### Testing your model
