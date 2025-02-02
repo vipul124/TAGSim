@@ -1,5 +1,6 @@
 # TAGSim: Topic-Informed Attention Guided Similarity
-This is the official GitHub repository for the implementation of the paper "**TAGSim: Topic-Informed Attention Guided Similarity Metric for Language Agnostic Sentence Comparisons**". Please cite our paper if you use this code.
+This is the official GitHub repository for the implementation of the paper "**TAGSim: Topic-Informed Attention Guided Similarity
+Metric for Image Caption Comparison**".
 
 ## Requirements
 - torch>=2.1.2
